@@ -1,4 +1,4 @@
-<!doctype html><html lang="fr"><head>
+<!doctype html><html lang="fr"><head><script id="bitume-v35-boot">document.documentElement.classList.add('bitume-welcome-boot');</script><style id="bitume-v35-boot-style">html.bitume-welcome-boot .app,html.bitume-welcome-active .app{visibility:hidden!important;pointer-events:none!important}html.bitume-welcome-boot,html.bitume-welcome-active{background:#080604!important}</style>
 <link rel="apple-touch-icon" sizes="180x180" href="/bitume-iphone-v19.png">
 <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/bitume-iphone-v19.png">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1615,6 +1615,43 @@ if('serviceWorker' in navigator){
 #bitumeWelcome.hidden{display:none!important}
 </style>
 
+
+<style id="bitume-v34-accueil-ajustements">
+/* Uniquement l'accueil : neutralise les anciennes positions absolues. */
+#bitumeWelcome:not(.hidden) .bw-shell{
+ width:430px!important;height:645px!important;min-height:645px!important;
+ padding:12px 22px 12px!important;box-sizing:border-box!important;
+}
+#bitumeWelcome .bw-logo{width:105px!important;height:105px!important;margin:0 auto 10px!important}
+#bitumeWelcome .bw-field{position:relative!important;display:block!important;margin:0 0 7px!important}
+#bitumeWelcome .bw-input,#bitumeWelcome .bw-input:focus{
+ position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+ width:100%!important;height:47px!important;
+}
+#bitumeWelcome .bw-mode-title{position:relative!important;margin:12px 0 13px!important}
+#bitumeWelcome .bw-modes{
+ position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+ width:100%!important;height:auto!important;min-height:0!important;
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important;
+ box-sizing:border-box!important;
+}
+#bitumeWelcome .bw-mode{
+ position:relative!important;min-width:0!important;max-width:100%!important;width:100%!important;
+ height:auto!important;aspect-ratio:.78!important;box-sizing:border-box!important;
+}
+#bitumeWelcome .bw-submit{
+ position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+ display:block!important;width:100%!important;height:54px!important;margin:21px 0 0!important;
+ box-sizing:border-box!important;font-size:19px!important;
+}
+/* Smartphone orange : pictogramme vectoriel, sans changer les autres icônes. */
+#bitumeWelcome .bw-field:nth-of-type(3):before{
+ content:""!important;width:15px!important;height:23px!important;box-sizing:border-box!important;
+ border:2.5px solid #ff7a21!important;border-radius:4px!important;
+ background:radial-gradient(circle at 50% 88%,#ff7a21 1.2px,transparent 1.6px)!important;
+ left:23px!important;
+}
+</style>
 <div id="bitumeWelcome" aria-label="Création du compte BITUME">
  <div class="bw-shell">
   <img class="bw-logo" src="./bitume-iphone-v19.png" alt="Logo BITUME">
@@ -1660,7 +1697,13 @@ if('serviceWorker' in navigator){
   };
   bwName.value=saved.name; bwEmail.value=saved.email; bwPhone.value=saved.phone; bwAge.value=saved.age;
 
-  if(localStorage.getItem(DONE)==='1') W.classList.add('hidden');
+  if(localStorage.getItem(DONE)==='1') {
+    W.classList.add('hidden');
+    document.documentElement.classList.remove('bitume-welcome-boot','bitume-welcome-active');
+  } else {
+    document.documentElement.classList.add('bitume-welcome-active');
+    document.documentElement.classList.remove('bitume-welcome-boot');
+  }
 
   document.getElementById('bwSubmit').addEventListener('click',function(){
     const name=bwName.value.trim(), email=bwEmail.value.trim(), phone=bwPhone.value.trim(), age=bwAge.value.trim();
@@ -1677,6 +1720,7 @@ if('serviceWorker' in navigator){
 
     if(typeof setEra==='function') setEra(era);
     W.classList.add('hidden');
+    document.documentElement.classList.remove('bitume-welcome-active','bitume-welcome-boot');
   });
 })();
 </script>
