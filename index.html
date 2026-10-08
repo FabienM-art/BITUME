@@ -920,7 +920,7 @@ body.era-90 section[data-screen="terrains"] .where *{
     if(!shell)return;
     const vw=window.innerWidth||430, vh=window.innerHeight||645;
     /* cover : remplit tout l'écran, comme une vraie app mobile */
-    const scale=Math.max(vw/430,vh/645);
+    const scale=Math.min(vw/430,vh/645);
     shell.style.setProperty('--bw-scale',scale);
   }
   window.addEventListener('resize',fitWelcome,{passive:true});
@@ -1019,7 +1019,7 @@ body.era-90 section[data-screen="terrains"] .where *{
   background-color:#080604!important;
   background-image:
     linear-gradient(rgba(0,0,0,.24),rgba(0,0,0,.38)),
-    url('/bitume-accueil-playground-night.png')!important;
+    url('./bitume-accueil-playground-night.png')!important;
   background-size:cover!important;
   background-position:center center!important;
   background-repeat:no-repeat!important;
@@ -1067,7 +1067,7 @@ body.era-90 section[data-screen="terrains"] .where *{
 #bitumeWelcome{
   background:
     linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.18)),
-    url('/bitume-accueil-playground-night.png') center center/cover no-repeat!important;
+    url('./bitume-accueil-playground-night.png') center center/cover no-repeat!important;
 }
 #bitumeWelcome,
 #bitumeWelcome input,
@@ -1547,7 +1547,7 @@ if('serviceWorker' in navigator){
 <style id="bitume-welcome-reference-v29">
 #bitumeWelcome{
  position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;
- overflow:auto!important;background:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)),url('/bitume-accueil-playground-night.png') center/cover no-repeat!important;
+ overflow:auto!important;background:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)),url('./bitume-accueil-playground-night.png') center/cover no-repeat!important;
  color:#fff!important;font-family:"Arial Narrow","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif!important;
 }
 #bitumeWelcome.hidden{display:none!important}
@@ -1575,9 +1575,9 @@ if('serviceWorker' in navigator){
 #bitumeWelcome .bw-mode-title:after{content:"CHOISIS TON MODE";font-size:17px!important;font-weight:500!important;letter-spacing:5px!important;text-shadow:0 2px 5px #000!important}
 #bitumeWelcome .bw-modes{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:12px!important;width:100%!important}
 #bitumeWelcome .bw-mode{position:relative!important;display:block!important;width:100%!important;aspect-ratio:.78!important;padding:0!important;border-radius:18px!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;overflow:hidden!important;cursor:pointer!important;box-shadow:0 10px 25px rgba(0,0,0,.35)!important}
-#bitumeWelcome .bw-mode[data-era="street"]{background-image:url('/welcome-mode-street.jpg')!important;border:3px solid #ff6d00!important}
-#bitumeWelcome .bw-mode[data-era="arcade"]{background-image:url('/welcome-mode-arcade.jpg')!important;border:3px solid #00bfe9!important}
-#bitumeWelcome .bw-mode[data-era="90"]{background-image:url('/welcome-mode-90.jpg')!important;border:3px solid #f5dfc4!important}
+#bitumeWelcome .bw-mode[data-era="street"]{background-image:url('./welcome-mode-street.jpg')!important;border:3px solid #ff6d00!important}
+#bitumeWelcome .bw-mode[data-era="arcade"]{background-image:url('./welcome-mode-arcade.jpg')!important;border:3px solid #00bfe9!important}
+#bitumeWelcome .bw-mode[data-era="90"]{background-image:url('./welcome-mode-90.jpg')!important;border:3px solid #f5dfc4!important}
 #bitumeWelcome .bw-mode-name,#bitumeWelcome .bw-mode-desc{display:none!important}
 #bitumeWelcome .bw-mode.selected{box-shadow:0 0 0 2px #fff,0 0 24px rgba(255,122,33,.65)!important}
 #bitumeWelcome .bw-mode.selected:after{content:"✓"!important;position:absolute!important;right:8px!important;top:8px!important;width:26px!important;height:26px!important;border-radius:50%!important;background:#ff7a21!important;color:#111!important;display:grid!important;place-items:center!important;font-weight:900!important}
@@ -1594,9 +1594,30 @@ if('serviceWorker' in navigator){
 }
 </style>
 
+<style id="bitume-v33-accueil-isole">
+/* V33: isolation de l'accueil; aucune modification des modes ou des terrains. */
+#bitumeWelcome:not(.hidden){
+ position:fixed!important;inset:0!important;width:100%!important;
+ height:100dvh!important;min-height:100vh!important;
+ z-index:2147483647!important;isolation:isolate!important;
+ overflow:hidden!important;
+ background-color:#080604!important;
+ background-image:linear-gradient(rgba(0,0,0,.06),rgba(0,0,0,.18)),url('./bitume-accueil-playground-night.png')!important;
+ background-position:center center!important;background-size:cover!important;
+ background-repeat:no-repeat!important;
+}
+#bitumeWelcome:not(.hidden) .bw-shell{
+ position:absolute!important;left:50%!important;top:50%!important;
+ width:430px!important;height:645px!important;min-height:645px!important;
+ margin:0!important;transform-origin:center center!important;
+ transform:translate(-50%,-50%) scale(var(--bw-scale,1))!important;
+}
+#bitumeWelcome.hidden{display:none!important}
+</style>
+
 <div id="bitumeWelcome" aria-label="Création du compte BITUME">
  <div class="bw-shell">
-  <img class="bw-logo" src="/bitume-iphone-v19.png" alt="Logo BITUME">
+  <img class="bw-logo" src="./bitume-iphone-v19.png" alt="Logo BITUME">
   <div class="bw-sub"></div>
   <div class="bw-card">
    <div class="bw-card-title"></div>
