@@ -1019,7 +1019,7 @@ body.era-90 section[data-screen="terrains"] .where *{
   background-color:#080604!important;
   background-image:
     linear-gradient(rgba(0,0,0,.24),rgba(0,0,0,.38)),
-    url('./bitume-accueil-playground-night.png')!important;
+    url('./bitume-accueil-playground-night.png?v=41')!important;
   background-size:cover!important;
   background-position:center center!important;
   background-repeat:no-repeat!important;
@@ -1067,7 +1067,7 @@ body.era-90 section[data-screen="terrains"] .where *{
 #bitumeWelcome{
   background:
     linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.18)),
-    url('./bitume-accueil-playground-night.png') center center/cover no-repeat!important;
+    url('./bitume-accueil-playground-night.png?v=41') center center/cover no-repeat!important;
 }
 #bitumeWelcome,
 #bitumeWelcome input,
@@ -1567,7 +1567,7 @@ if('serviceWorker' in navigator){
 <style id="bitume-welcome-reference-v29">
 #bitumeWelcome{
  position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;
- overflow:auto!important;background:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)),url('./bitume-accueil-playground-night.png') center/cover no-repeat!important;
+ overflow:auto!important;background:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)),url('./bitume-accueil-playground-night.png?v=41') center/cover no-repeat!important;
  color:#fff!important;font-family:"Arial Narrow","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif!important;
 }
 #bitumeWelcome.hidden{display:none!important}
@@ -1622,7 +1622,7 @@ if('serviceWorker' in navigator){
  z-index:2147483647!important;isolation:isolate!important;
  overflow:hidden!important;
  background-color:#080604!important;
- background-image:linear-gradient(rgba(0,0,0,.06),rgba(0,0,0,.18)),url('./bitume-accueil-playground-night.png')!important;
+ background-image:linear-gradient(rgba(0,0,0,.06),rgba(0,0,0,.18)),url('./bitume-accueil-playground-night.png?v=41')!important;
  background-position:center center!important;background-size:cover!important;
  background-repeat:no-repeat!important;
 }
@@ -1771,11 +1771,23 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
     document.querySelectorAll('#bitume-nav [data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go==='terrains'));
     window.dispatchEvent(new Event('bitume:account-created'));
   }
-  if(window.BITUME_BACKEND.valid()){
+  // V41: attendre la restauration éventuelle du jeton avant de décider d'afficher l'accueil.
+  // Un compte confirmé ne doit pas être renvoyé vers le formulaire au chargement.
+  async function restoreAccount(){
+    if(!window.BITUME_BACKEND.valid()) await window.BITUME_BACKEND.refresh();
+    if(!window.BITUME_BACKEND.valid()) return;
+    W.classList.add('hidden');
     const pending=localStorage.getItem('bitume_pending_signup_v39');
-    if(pending){try{finishSignup(JSON.parse(pending)).then(()=>localStorage.removeItem('bitume_pending_signup_v39')).catch(e=>{bwError.textContent=e.message;bwError.style.display='block'})}catch(_){}}
-    else W.classList.add('hidden');
+    if(pending){
+      try{
+        await finishSignup(JSON.parse(pending));
+        localStorage.removeItem('bitume_pending_signup_v39');
+      }catch(e){console.warn('BITUME: profil à synchroniser',e);}
+    }
+    document.querySelectorAll('.app-screen').forEach(x=>x.classList.toggle('active',x.dataset.screen==='terrains'));
+    document.querySelectorAll('#bitume-nav [data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go==='terrains'));
   }
+  restoreAccount().catch(e=>console.warn('BITUME: restauration session',e));
 
   document.getElementById('bwSubmit').addEventListener('click',async function(){
     const name=bwName.value.trim(),email=bwEmail.value.trim(),phone=bwPhone.value.trim(),age=bwAge.value.trim();
