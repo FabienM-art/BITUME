@@ -1756,6 +1756,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
     phone:localStorage.getItem('bitume_user_phone')||'',
     age:localStorage.getItem('bitume_user_age')||''
   };
+  const bwName=document.getElementById('bwName'),bwEmail=document.getElementById('bwEmail'),bwPhone=document.getElementById('bwPhone'),bwAge=document.getElementById('bwAge');
   bwName.value=saved.name; bwEmail.value=saved.email; bwPhone.value=saved.phone; bwAge.value=saved.age;
   document.documentElement.classList.add('bitume-v36-ready');
 
@@ -1779,7 +1780,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
   document.getElementById('bwSubmit').addEventListener('click',async function(){
     const name=bwName.value.trim(),email=bwEmail.value.trim(),phone=bwPhone.value.trim(),age=bwAge.value.trim();
     const ok=name.length>=2&&email&&phone&&age&&bwEmail.checkValidity()&&+age>0&&+age<=120;
-    const error=document.getElementById('bwError');error.style.display=ok?'none':'block';if(!ok)return;
+    const error=document.getElementById('bwError');error.style.display=ok?'none':'block';if(!ok){error.textContent='Vérifie les quatre champs : nom (2 caractères minimum), e-mail valide, téléphone et âge entre 1 et 120.';return;}
     const button=this;button.disabled=true;button.textContent='CONNEXION SÉCURISÉE…';
     try{
       const pending={name,email,age,era};
