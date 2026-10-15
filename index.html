@@ -1,4 +1,4 @@
-<!doctype html><html lang="fr"><head><style id="bitume-v36-initial-paint">html:not(.bitume-v36-ready) .app{visibility:hidden!important}html:not(.bitume-v36-ready){background:#080604!important}#bitumeWelcome:not(.hidden){z-index:2147483647!important}</style>
+<!doctype html><html lang="fr"><head><style id="bitume-v36-initial-paint">html:not(.bitume-auth-checked) .app-screen,html:not(.bitume-auth-checked) #bitume-nav{visibility:hidden!important}html:not(.bitume-v36-ready){background:#080604!important}#bitumeWelcome:not(.hidden){z-index:2147483647!important}</style>
 <link rel="apple-touch-icon" sizes="180x180" href="./bitume-iphone-v19.png">
 <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./bitume-iphone-v19.png">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1108,7 +1108,7 @@ body.era-90 section[data-screen="terrains"] .where *{
 <input id="search" class="search" placeholder="Rechercher un terrain…">
 <div class="chips"><button class="chip active">À PROXIMITÉ</button><button class="chip">VILLE</button><button class="chip">ACCÈS LIBRE</button><button class="chip" id="radius">5 KM</button></div>
 
-<div class="mapwrap"><div id="map"></div><div class="maplabel" id="maplabel">CARTE · LYON</div><button class="locate" id="locate" title="Calculer mes distances" aria-label="Calculer mes distances">◎</button></div>
+<div class="mapwrap"><div id="map"></div><div class="maplabel" id="maplabel">ACTIVE LA LOCALISATION POUR VOIR LES TERRAINS</div><button class="locate" id="locate" title="Calculer mes distances" aria-label="Calculer mes distances">◎</button></div>
 
 <div class="sectiontitle">TERRAINS AUTOUR DE TOI</div>
 <div class="cards" id="cards"></div>
@@ -1359,7 +1359,7 @@ function locate(){
    map.setView(user,14);draw();
    try{await loadCourtsAroundUser()}
    catch(e){document.querySelector('#maplabel').textContent=courts.length?courts.length+' TERRAINS AUTOUR DE TOI · DONNÉES EN CACHE':'RECHERCHE INDISPONIBLE · RÉESSAYER AVEC LE BOUTON GPS';document.querySelector('#where').textContent='AUTOUR DE TOI · '+radius+' KM';draw()}
- },()=>document.querySelector('#maplabel').textContent='POSITION NON AUTORISÉE',{enableHighAccuracy:false,timeout:12000,maximumAge:300000});
+ },(err)=>{document.querySelector('#maplabel').textContent=err.code===1?'POSITION REFUSÉE · AUTORISE LA LOCALISATION DANS SAFARI':err.code===3?'GPS TROP LENT · RÉESSAYER':'POSITION INDISPONIBLE · RÉESSAYER';},{enableHighAccuracy:false,timeout:12000,maximumAge:300000});
 }
 document.querySelector('#locate').onclick=locate;
 window.addEventListener('bitume:account-created',()=>{setTimeout(()=>{map.invalidateSize();locate()},120)});
@@ -1674,9 +1674,23 @@ if('serviceWorker' in navigator){
 </style>
 <style id="bitume-v42-auth-and-ui-fix">
 html:not(.bitume-auth-checked) #bitumeWelcome{visibility:hidden!important}
-html:not(.bitume-auth-checked) .app{visibility:hidden!important}
+html:not(.bitume-auth-checked) .app-screen,html:not(.bitume-auth-checked) #bitume-nav{visibility:hidden!important}
 #bitumeWelcome .bw-mode.selected{box-shadow:inset 0 0 0 2px #fff,0 0 10px rgba(255,122,33,.45)!important;outline:none!important}
 #bitumeWelcome .bw-field::before{display:block!important;opacity:1!important}
+#bitumeWelcome .bw-input{padding-left:60px!important}
+</style>
+<style id="bitume-v43-stability">
+/* Ne jamais montrer Terrains pendant l'initialisation de l'authentification. */
+html:not(.bitume-auth-checked) .app-screen,html:not(.bitume-auth-checked) #bitume-nav{visibility:hidden!important}
+/* Sans session, aucun écran interne n'est affiché derrière l'accueil. */
+html.bitume-auth-checked:not(.bitume-authenticated) .app-screen,html.bitume-auth-checked:not(.bitume-authenticated) #bitume-nav{visibility:hidden!important}
+#bitumeWelcome .bw-modes{gap:12px!important;overflow:visible!important}
+#bitumeWelcome .bw-mode,#bitumeWelcome .bw-mode.selected{outline:none!important;outline-offset:0!important;box-shadow:none!important;transform:none!important;filter:none!important;overflow:hidden!important}
+#bitumeWelcome .bw-mode.selected{box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 5px #ff7a21!important}
+#bitumeWelcome .bw-mode.selected:after{right:7px!important;top:7px!important}
+#bitumeWelcome .bw-field::before{content:none!important;display:none!important}
+#bitumeWelcome .bw-field .bw-icon{display:flex!important;position:absolute!important;z-index:8!important;left:19px!important;top:50%!important;transform:translateY(-50%)!important;align-items:center!important;justify-content:center!important;width:27px!important;height:27px!important;font-size:22px!important;color:#ff822e!important;pointer-events:none!important;font-style:normal!important;line-height:1!important}
+#bitumeWelcome .bw-field .bw-icon svg{width:23px!important;height:23px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 #bitumeWelcome .bw-input{padding-left:60px!important}
 </style>
 <div id="bitumeWelcome" aria-label="Création du compte BITUME">
@@ -1685,10 +1699,10 @@ html:not(.bitume-auth-checked) .app{visibility:hidden!important}
   <div class="bw-sub"></div>
   <div class="bw-card">
    <div class="bw-card-title"></div>
-   <label class="bw-field"><span>NOM</span><input class="bw-input" id="bwName" autocomplete="name" placeholder="Nom"></label>
-   <label class="bw-field"><span>MAIL</span><input class="bw-input" id="bwEmail" type="email" autocomplete="email" placeholder="Mail"></label>
-   <label class="bw-field"><span>TÉLÉPHONE</span><input class="bw-input" id="bwPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Téléphone"></label>
-   <label class="bw-field"><span>ÂGE</span><input class="bw-input" id="bwAge" type="number" min="1" max="120" inputmode="numeric" placeholder="Âge"></label>
+   <label class="bw-field"><span>NOM</span><i class="bw-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></i><input class="bw-input" id="bwName" autocomplete="name" placeholder="Nom"></label>
+   <label class="bw-field"><span>MAIL</span><i class="bw-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></i><input class="bw-input" id="bwEmail" type="email" autocomplete="email" placeholder="Mail"></label>
+   <label class="bw-field"><span>TÉLÉPHONE</span><i class="bw-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></i><input class="bw-input" id="bwPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Téléphone"></label>
+   <label class="bw-field"><span>ÂGE</span><i class="bw-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 9v7M12 7h.01"/></svg></i><input class="bw-input" id="bwAge" type="number" min="1" max="120" inputmode="numeric" placeholder="Âge"></label>
    <div class="bw-mode-title">CHOISIS TON MODE</div>
    <div class="bw-modes" aria-label="Mode par défaut">
     <button class="bw-mode selected" type="button" data-era="street" aria-label="Street"><span class="bw-mode-name">STREET</span><span class="bw-mode-desc"></span></button>
@@ -1773,7 +1787,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
     localStorage.removeItem('bitume_user_phone');localStorage.setItem('bitume_user_age',data.age);
     localStorage.setItem('bitume_era',data.era);localStorage.setItem(DONE,'1');
     if(typeof setEra==='function')setEra(data.era);
-    W.classList.add('hidden');document.documentElement.classList.add('bitume-v36-ready');
+    document.documentElement.classList.add('bitume-authenticated');W.classList.add('hidden');document.documentElement.classList.add('bitume-v36-ready');
     document.querySelectorAll('.app-screen').forEach(x=>x.classList.toggle('active',x.dataset.screen==='terrains'));
     document.querySelectorAll('#bitume-nav [data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go==='terrains'));
     window.dispatchEvent(new Event('bitume:account-created'));
@@ -1783,6 +1797,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
   async function restoreAccount(){
     if(!window.BITUME_BACKEND.valid()) await window.BITUME_BACKEND.refresh();
     if(!window.BITUME_BACKEND.valid()) return;
+    document.documentElement.classList.add('bitume-authenticated');
     W.classList.add('hidden');
     const pending=localStorage.getItem('bitume_pending_signup_v39');
     if(pending){
