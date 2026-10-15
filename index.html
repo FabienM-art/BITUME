@@ -1672,6 +1672,13 @@ if('serviceWorker' in navigator){
  left:23px!important;
 }
 </style>
+<style id="bitume-v42-auth-and-ui-fix">
+html:not(.bitume-auth-checked) #bitumeWelcome{visibility:hidden!important}
+html:not(.bitume-auth-checked) .app{visibility:hidden!important}
+#bitumeWelcome .bw-mode.selected{box-shadow:inset 0 0 0 2px #fff,0 0 10px rgba(255,122,33,.45)!important;outline:none!important}
+#bitumeWelcome .bw-field::before{display:block!important;opacity:1!important}
+#bitumeWelcome .bw-input{padding-left:60px!important}
+</style>
 <div id="bitumeWelcome" aria-label="Création du compte BITUME">
  <div class="bw-shell">
   <img class="bw-logo" src="./bitume-iphone-v19.png" alt="Logo BITUME">
@@ -1713,7 +1720,7 @@ async function api(path,method='GET',body,auth=false){
 }
 function save(x){session=x?{...x,expires_at:Math.floor(Date.now()/1000)+(x.expires_in||3600)}:null;if(session)localStorage.setItem(STORE,JSON.stringify(session));else localStorage.removeItem(STORE)}
 async function refresh(){if(!session?.refresh_token)return;try{const d=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token});save(d)}catch(_){save(null)}}
-async function emailOtp(email){return api('/auth/v1/otp','POST',{email,create_user:true,options:{email_redirect_to:'https://fabienm-art.github.io/BITUME/'}})}
+async function emailOtp(email){return api('/auth/v1/otp?redirect_to='+encodeURIComponent('https://fabienm-art.github.io/BITUME/'),'POST',{email,create_user:true})}
 async function verify(email,token){const d=await api('/auth/v1/verify','POST',{email,token,type:'email'});save(d);return d}
 async function syncProfile(name,age,era){if(!valid())await refresh();if(!valid())throw Error('Connexion expirée');const uid=session.user?.id;if(!uid)throw Error('Compte non identifié');
  const n=Number(age);const category=n<=12?'-12':n<=16?'13-16':n<=20?'17-20':n<=25?'21-25':n<=35?'25-35':'36+';
@@ -1757,7 +1764,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
     age:localStorage.getItem('bitume_user_age')||''
   };
   const bwName=document.getElementById('bwName'),bwEmail=document.getElementById('bwEmail'),bwPhone=document.getElementById('bwPhone'),bwAge=document.getElementById('bwAge');
-  bwName.value=saved.name; bwEmail.value=saved.email; bwPhone.value=saved.phone; bwAge.value=saved.age;
+  bwName.value=''; bwEmail.value=''; bwPhone.value=''; bwAge.value='';
   document.documentElement.classList.add('bitume-v36-ready');
 
   async function finishSignup(data){
@@ -1787,7 +1794,7 @@ window.BITUME_BACKEND={emailOtp,verify,syncProfile,rpc,valid,refresh,save,sessio
     document.querySelectorAll('.app-screen').forEach(x=>x.classList.toggle('active',x.dataset.screen==='terrains'));
     document.querySelectorAll('#bitume-nav [data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go==='terrains'));
   }
-  restoreAccount().catch(e=>console.warn('BITUME: restauration session',e));
+  restoreAccount().catch(e=>console.warn('BITUME: restauration session',e)).finally(()=>{document.documentElement.classList.add('bitume-auth-checked');});
 
   document.getElementById('bwSubmit').addEventListener('click',async function(){
     const name=bwName.value.trim(),email=bwEmail.value.trim(),phone=bwPhone.value.trim(),age=bwAge.value.trim();
